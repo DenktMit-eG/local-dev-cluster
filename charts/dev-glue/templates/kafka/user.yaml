@@ -1,0 +1,10 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: kafka-super-user
+  labels:
+    strimzi.io/cluster: {{ .Values.kafka.clusterName }}
+    {{- include "dev-glue.labels" . | nindent 4}}
+spec:
+  authentication:
+    type: tls

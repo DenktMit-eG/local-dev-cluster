@@ -1,0 +1,31 @@
+traefik:
+  globalArguments: []
+
+  providers:
+    kubernetesIngress:
+      publishedService:
+        enabled: false
+  nodeSelector:
+    ingress-ready: "true"
+  tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Equal
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Equal
+  deployment:
+    replicas: 1
+
+  service:
+    enabled: false
+
+  ports:
+    web:
+      hostPort: 80
+    websecure:
+      hostPort: 443
+    kafka-mtls:
+      port: 9094
+      hostPort: 9094
+      containerPort: 9094

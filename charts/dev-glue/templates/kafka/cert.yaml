@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-broker
+  labels:
+    {{- include "dev-glue.labels" . | nindent 4}}
+spec:
+  secretName: kafka-broker-ca
+  issuerRef:
+    name: default-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - bootstrap.{{ .Values.global.projectDomain}}
+    - b0.{{ .Values.global.projectDomain}}

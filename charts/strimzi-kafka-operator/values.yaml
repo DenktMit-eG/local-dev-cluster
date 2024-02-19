@@ -1,0 +1,5 @@
+strimzi-kafka-operator:
+  replicas: 1
+  watchAnyNamespace: true
+  featureGates: +KafkaNodePools,+UseKRaft,+UnidirectionalTopicOperator
+  labelsExclusionPattern: '(^app.kubernetes.io/(?!part-of)|argocd.argoproj.io/instance).*'

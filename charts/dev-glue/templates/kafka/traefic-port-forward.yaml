@@ -1,0 +1,21 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: kafka-brokers-ingressroute
+  labels:
+    {{- include "dev-glue.labels" . | nindent 4}}
+spec:
+  entryPoints:
+    - kafka-mtls
+  routes:
+    - match: HostSNI(`bootstrap.{{ .Values.global.projectDomain }}`)
+      services:
+        - name: kafka-lfg-kafka-external-bootstrap
+          port: 9094
+    - match: HostSNI(`b0.{{ .Values.global.projectDomain }}`)
+      services:
+        - name: kafka-lfg-kafka-lfg-default-0
+          port: 9094
+  tls:
+    secretName: kafka-broker-ca
+    passthrough: true

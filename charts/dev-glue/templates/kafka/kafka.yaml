@@ -1,0 +1,76 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ .Values.kafka.clusterName }}
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
+  labels:
+    {{- include "dev-glue.labels" . | nindent 4 }}
+spec:
+  entityOperator:
+    userOperator: {}
+    topicOperator: {}
+
+  kafka:
+    version: 3.6.0
+    # The replicas field is required by the Kafka CRD schema while the KafkaNodePools feature gate is in alpha phase.
+    # But it will be ignored when Kafka Node Pools are used
+    replicas: 1
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: true
+        authentication:
+          type: scram-sha-512
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+        authentication:
+          type: tls
+      - name: external
+        port: 9094
+        # traffic is proxied trough traefik
+        type: cluster-ip
+        tls: true
+        authentication:
+          type: tls
+        configuration:
+          bootstrap:
+            alternativeNames:
+              -  bootstrap.{{ .Values.global.projectDomain}}
+          brokers:
+            - broker: 0
+              advertisedHost: b0.{{ .Values.global.projectDomain}}
+          brokerCertChainAndKey:
+            secretName: kafka-broker-ca
+            certificate: tls.crt
+            key: tls.key
+    authorization:
+      type: simple
+      superUsers:
+        - CN=kafka-super-user
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      default.replication.factor: 1
+      min.insync.replicas: 1
+      inter.broker.protocol.version: "3.6"
+    # The storage field is required by the Kafka CRD schema while the KafkaNodePools feature gate is in alpha phase.
+    # But it will be ignored when Kafka Node Pools are used
+    storage:
+      type: jbod
+      volumes:
+        - id: 0
+          type: persistent-claim
+          size: 10Gi
+          deleteClaim: false
+  zookeeper:
+    replicas: 1
+    storage:
+      type: persistent-claim
+      size: 10Gi
+      deleteClaim: true

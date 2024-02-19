@@ -1,0 +1,5 @@
+global:
+  projectDomain: "local.lgc"
+
+kafka:
+  clusterName: kafka-lfg
