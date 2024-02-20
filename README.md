@@ -1,6 +1,4 @@
-# Module Foundation
 
-This is the WiP Documentation for the foundation for module development.
 
 ## Prerequisites
 
