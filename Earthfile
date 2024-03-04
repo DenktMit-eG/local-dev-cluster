@@ -1,4 +1,5 @@
 VERSION 0.8
+FROM alpine:3.19.1
 
 deps:
     COPY ./charts ./charts
