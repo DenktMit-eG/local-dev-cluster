@@ -1,3 +1,4 @@
+VERSION 0.8
 
 deps:
     COPY ./charts ./charts
