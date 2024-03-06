@@ -4,8 +4,10 @@ FROM alpine:3.19.1
 deps:
     COPY ./charts ./charts
     COPY ./kind ./kind
+    COPY ./scripts ./scripts
     SAVE ARTIFACT ./charts
     SAVE ARTIFACT ./kind
+    SAVE ARTIFACT ./scripts
 
 kind-create-local:
     LOCALLY
