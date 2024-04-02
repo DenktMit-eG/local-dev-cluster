@@ -21,6 +21,7 @@ KIND_CREATE_CLUSTER() {
 # Function to retrieve secrets for Kafka
 KIND_GET_SECRETS() {
     mkdir -p ./secrets/kafka
+    sleep 15 # Workaround: waiting for https://github.com/kubernetes/kubernetes/pull/122994 to get merged
     kubectl get secrets kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > secrets/kafka/userpass.txt && \
     cat "$(mkcert -CAROOT)/rootCA.pem" > secrets/kafka/ca.crt && \
     kubectl get secrets kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> secrets/kafka/ca.crt && \

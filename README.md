@@ -75,6 +75,21 @@ helm upgrade --install glue ./charts/dev-glue --atomic  --set "global.projectDom
 helm upgrade --install --create-namespace --atomic  --namespace keycloak keycloak ./charts/keycloak  --set "global.projectDomain=${PROJECT_DOMAIN}"
 ```
 
+### Setup / Recreate using Earthly
+
+You can also use the repos Earthly scripts to install or recreate the cluster within minutes.
+NOTE: This will not install [prerequisities](#Prerequisites)
+
+#### Create
+```bash
+earthly +kind-create-local
+```
+
+#### Recreate
+```bash
+earthly +kind-recreate-local
+```
+
 ### get kafka secret
 
 ```shell
@@ -154,3 +169,5 @@ const oidcConfig: AuthProviderProps = {
     redirect_uri: document.baseURI,
 };
 ```
+
+
