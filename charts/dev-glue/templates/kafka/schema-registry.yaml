@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schema-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: schema-registry
+  template:
+    metadata:
+      labels:
+        app: schema-registry
+    spec:
+      containers:
+        - name: schema-registry
+          image: confluentinc/cp-schema-registry:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
+              value: PLAINTEXT://kafka-lfg-kafka-lfg-default-0:9093
+            - name: SCHEMA_REGISTRY_HOST_NAME
+              value: schema-registry
+            - name: SCHEMA_REGISTRY_LISTENERS
+              value: http://0.0.0.0:8081
+            - name: SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL
+              value: SSL
+            - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_TYPE
+              value: PEM
+            - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION
+              value: /etc/kafka/secrets/ca.crt
+            - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION
+              value: /etc/kafka/secrets/user.p12
+            - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_TYPE
+              value: PKCS12
+            - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-super-user
+                  key: user.password
+          volumeMounts:
+            - name: kafka-secrets
+              mountPath: /etc/kafka/secrets
+              readOnly: true
+      volumes:
+        - name: kafka-secrets
+          secret:
+            secretName: kafka-super-user
+            items:
+              - key: ca.crt
+                path: ca.crt
+              - key: user.p12
+                path: user.p12
+        - name: kafka-ca-cert
+          secret:
+            secretName: kafka-super-user
+            items:
+              - key: ca.crt
+                path: ca.crt
