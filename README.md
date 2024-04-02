@@ -1,6 +1,4 @@
-# Module Foundation
 
-This is the WiP Documentation for the foundation for module development.
 
 ## Prerequisites
 
@@ -119,6 +117,7 @@ To access your ingresses you should add them to your /etc/hosts
 
 ```bash
 127.0.0.1       keycloak.local.lgc
+127.0.0.1       b0.local.lgc
 127.0.0.1       bootstrap.local.lgc
 ```
 
