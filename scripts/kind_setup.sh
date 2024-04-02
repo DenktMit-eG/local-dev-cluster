@@ -2,6 +2,7 @@
 
 # Function to create kind cluster and setup helm charts
 KIND_CREATE_CLUSTER() {
+    CHECK_PREREQUISITES
     kind create cluster --config=./kind/kind-cluster.yaml && \
     helm dep up charts/strimzi-kafka-operator && \
     helm dep up charts/traefik && \
@@ -20,12 +21,20 @@ KIND_CREATE_CLUSTER() {
 
 # Function to retrieve secrets for Kafka
 KIND_GET_SECRETS() {
+    CHECK_PREREQUISITES
     mkdir -p ./secrets/kafka
     sleep 15 # Workaround: waiting for https://github.com/kubernetes/kubernetes/pull/122994 to get merged
     kubectl get secrets kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > secrets/kafka/userpass.txt && \
     cat "$(mkcert -CAROOT)/rootCA.pem" > secrets/kafka/ca.crt && \
     kubectl get secrets kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> secrets/kafka/ca.crt && \
     kubectl get secrets kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > secrets/kafka/user.p12
+}
+
+CHECK_PREREQUISITES() {
+  if ! hash kubectl 2>/dev/null; then fail "kubectl not installed"; exit 1; fi
+  if ! hash helm 2>/dev/null; then fail "helm not installed"; exit 1; fi
+  if ! hash mkcert 2>/dev/null; then fail "mkcert not installed"; exit 1; fi
+  if ! hash Docker 2>/dev/null; then fail "Docker not installed"; exit 1; fi
 }
 
 # Check command line arguments to determine which function to call
