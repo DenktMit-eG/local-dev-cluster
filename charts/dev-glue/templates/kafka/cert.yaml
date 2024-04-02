@@ -12,4 +12,3 @@ spec:
   dnsNames:
     - bootstrap.{{ .Values.global.projectDomain}}
     - b0.{{ .Values.global.projectDomain}}
-    - kafka-lfg-kafka-external-bootstrap.{{ .Release.Namespace }}.svc.cluster.local
