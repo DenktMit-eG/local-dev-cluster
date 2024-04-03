@@ -15,7 +15,8 @@ KIND_CREATE_CLUSTER() {
       --cert="$(mkcert -CAROOT)/rootCA.pem" \
       --key="$(mkcert -CAROOT)/rootCA-key.pem" \
       --namespace=cert-manager && \
-    helm upgrade --install glue ./charts/dev-glue --atomic --set "global.projectDomain=${PROJECT_DOMAIN}" && \
+    helm upgrade --install -n strimzi-kafka-operator  strimzi-registry-operator charts/strimzi-registry-operator
+    helm upgrade --create-namespace --install -n glue glue ./charts/dev-glue --atomic  --set "global.projectDomain=${PROJECT_DOMAIN}" && \
     helm upgrade --install --create-namespace --atomic --namespace keycloak keycloak ./charts/keycloak --set "global.projectDomain=${PROJECT_DOMAIN}"
 }
 

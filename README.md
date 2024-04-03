@@ -1,4 +1,14 @@
+This repository contains an example for a local development environment on kubernetes
+It contains:
+- [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator/tree/0.40.0/examples)
+  - Preconfigured Kafka Cluster
+- [Strimzi Registry Operator](https://github.com/lsst-sqre/strimzi-registry-operator)
+  - Preconfigured Schema Registry
+- [keycloak](https://www.keycloak.org/)
+- [traefik](https://doc.traefik.io/traefik/)
+- [cert-manager](https://cert-manager.io/)
 
+Traefik and cert-manager is configured for local DNS resolution and tls with valid certificates
 
 ## Prerequisites
 
@@ -56,6 +66,7 @@ It should print `kind-lgc`. If not see Set Context
 helm dep up charts/strimzi-kafka-operator
 helm dep up charts/traefik 
 helm dep up charts/cert-manager
+helm dep up charts/strimzi-registry-operator
 ```
 
 ### Installing the operators
@@ -69,13 +80,14 @@ kubectl create secret tls root-ca-secret \
   --cert="$(mkcert -CAROOT)/rootCA.pem" \
   --key="$(mkcert -CAROOT)/rootCA-key.pem" \
   --namespace=cert-manager
-helm upgrade --install glue ./charts/dev-glue --atomic  --set "global.projectDomain=${PROJECT_DOMAIN}"
+helm upgrade --install -n strimzi-kafka-operator  strimzi-registry-operator charts/strimzi-registry-operator
+helm upgrade --create-namespace --install -n glue glue ./charts/dev-glue --atomic  --set "global.projectDomain=${PROJECT_DOMAIN}"
 helm upgrade --install --create-namespace --atomic  --namespace keycloak keycloak ./charts/keycloak  --set "global.projectDomain=${PROJECT_DOMAIN}"
 ```
 
 ### Setup / Recreate using Earthly
 
-You can also use the repos Earthly scripts to install or recreate the cluster within minutes.
+You can also use the Earthly scripts to install or recreate the cluster within minutes.
 NOTE: This will not install [prerequisities](#Prerequisites)
 
 #### Create
@@ -91,10 +103,10 @@ earthly +kind-recreate-local
 ### get kafka secret
 
 ```shell
-kubectl get secrets kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > userpass.txt
+kubectl get secrets -n kafka-lfg kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > userpass.txt
 cat "$(mkcert -CAROOT)/rootCA.pem"  > ca.crt
-kubectl get secrets kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> ca.crt
-kubectl get secrets kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > user.p12 
+kubectl get secrets -n kafka-lfg kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> ca.crt
+kubectl get secrets -n kafka-lfg kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > user.p12 
 ```
 
 ### Kafka Settings for Big Datatools in Intellij
