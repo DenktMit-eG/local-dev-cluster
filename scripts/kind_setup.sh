@@ -5,6 +5,7 @@ KIND_CREATE_CLUSTER() {
     CHECK_PREREQUISITES
     kind create cluster --config=./kind/kind-cluster.yaml && \
     helm dep up charts/strimzi-kafka-operator && \
+    helm dep up charts/strimzi-registry-operator && \
     helm dep up charts/traefik && \
     helm dep up charts/cert-manager && \
     export PROJECT_DOMAIN="local.lgc" && \
