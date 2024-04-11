@@ -2,6 +2,8 @@ apiVersion: roundtable.lsst.codes/v1beta1
 kind: StrimziSchemaRegistry
 metadata:
   name: confluent-schema-registry
+  labels:
+    {{- include "dev-glue.labels" . | nindent 4}}
 spec:
   listener: tls
   securityProtocol: SSL

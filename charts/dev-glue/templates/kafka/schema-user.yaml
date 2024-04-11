@@ -4,6 +4,7 @@ metadata:
   name: confluent-schema-registry
   labels:
     strimzi.io/cluster: {{ .Values.kafka.clusterName }}
+    {{- include "dev-glue.labels" . | nindent 4}}
 spec:
   authentication:
     type: tls

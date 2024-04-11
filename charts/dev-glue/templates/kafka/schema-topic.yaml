@@ -3,6 +3,7 @@ kind: KafkaTopic
 metadata:
   name: registry-schemas
   labels:
+    {{- include "dev-glue.labels" . | nindent 4}}
     strimzi.io/cluster: {{ .Values.kafka.clusterName }}
 spec:
   partitions: 1
