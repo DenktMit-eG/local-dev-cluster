@@ -103,10 +103,10 @@ earthly +kind-recreate-local
 ### get kafka secret
 
 ```shell
-kubectl get secrets -n kafka-lfg kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > userpass.txt
+kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > userpass.txt
 cat "$(mkcert -CAROOT)/rootCA.pem"  > ca.crt
-kubectl get secrets -n kafka-lfg kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> ca.crt
-kubectl get secrets -n kafka-lfg kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > user.p12 
+kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> ca.crt
+kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > user.p12 
 ```
 
 ### Kafka Settings for Big Datatools in Intellij
@@ -131,6 +131,7 @@ To access your ingresses you should add them to your /etc/hosts
 127.0.0.1       keycloak.local.lgc
 127.0.0.1       b0.local.lgc
 127.0.0.1       bootstrap.local.lgc
+127.0.0.1       sr.local.lgc
 ```
 
 ### Set Context (also happens after cluster creation)
@@ -181,4 +182,6 @@ const oidcConfig: AuthProviderProps = {
 };
 ```
 
+### Accessing the Schema Registry
 
+The schema registry is available at `https://sr.local.lgc`

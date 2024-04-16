@@ -15,3 +15,23 @@ strimzi-registry-operator:
 
   # -- Namespace where the strimzi-registry-operator is deployed
   operatorNamespace: strimzi-kafka-operator
+
+service:
+  type: ClusterIP
+  port: 8081
+  name: "confluent-schema-registry"
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    cert-manager.io/cluster-issuer: default-cluster-issuer
+  hosts:
+    - host: sr.local.lgc
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: sr-tls
+      hosts:
+        - sr.local.lgc
