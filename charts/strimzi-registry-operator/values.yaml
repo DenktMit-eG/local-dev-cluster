@@ -23,6 +23,7 @@ service:
 
 ingress:
   enabled: true
+  namespace: "glue"
   className: ""
   annotations:
     cert-manager.io/cluster-issuer: default-cluster-issuer
