@@ -26,10 +26,10 @@ KIND_GET_SECRETS() {
     CHECK_PREREQUISITES
     mkdir -p ./secrets/kafka
     sleep 15 # Workaround: waiting for https://github.com/kubernetes/kubernetes/pull/122994 to get merged
-    kubectl get secrets kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > secrets/kafka/userpass.txt && \
+    kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > secrets/kafka/userpass.txt && \
     cat "$(mkcert -CAROOT)/rootCA.pem" > secrets/kafka/ca.crt && \
-    kubectl get secrets kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> secrets/kafka/ca.crt && \
-    kubectl get secrets kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > secrets/kafka/user.p12
+    kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> secrets/kafka/ca.crt && \
+    kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > secrets/kafka/user.p12
 }
 
 CHECK_PREREQUISITES() {
