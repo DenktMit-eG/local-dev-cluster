@@ -63,7 +63,7 @@ CHECK_PREREQUISITES() {
   if ! hash kubectl 2>/dev/null; then fail "kubectl not installed"; exit 1; fi
   if ! hash helm 2>/dev/null; then fail "helm not installed"; exit 1; fi
   if ! hash mkcert 2>/dev/null; then fail "mkcert not installed"; exit 1; fi
-  if ! hash Docker 2>/dev/null; then fail "Docker not installed"; exit 1; fi
+  if ! hash docker 2>/dev/null; then fail "docker not installed"; exit 1; fi
 }
 
 # Check command line arguments to determine which function to call
