@@ -271,6 +271,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# End of https://www.gitignore.io/api/go,helm,linux,macos,windows,eclipse,intellij+all,vim
+application.yaml
+secrets
 ca.crt
 user.p12
 userpass.txt

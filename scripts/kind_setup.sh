@@ -1,5 +1,9 @@
 #!/bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+mkdir -p "${SCRIPT_DIR}/../secrets"
+SECRETS_DIR="$( cd "${SCRIPT_DIR}/../secrets" &> /dev/null && pwd )"
+
 # Function to create kind cluster and setup helm charts
 KIND_CREATE_CLUSTER() {
     CHECK_PREREQUISITES
@@ -24,19 +28,42 @@ KIND_CREATE_CLUSTER() {
 # Function to retrieve secrets for Kafka
 KIND_GET_SECRETS() {
     CHECK_PREREQUISITES
-    mkdir -p ./secrets/kafka
+    mkdir -p "${SECRETS_DIR}/kafka"
     sleep 15 # Workaround: waiting for https://github.com/kubernetes/kubernetes/pull/122994 to get merged
-    kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > secrets/kafka/userpass.txt && \
-    cat "$(mkcert -CAROOT)/rootCA.pem" > secrets/kafka/ca.crt && \
-    kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> secrets/kafka/ca.crt && \
-    kubectl get secrets -n glue kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > secrets/kafka/user.p12
+    kubectl -n glue get secrets kafka-super-user -o jsonpath='{.data.user\.password}' | base64 -d > "${SECRETS_DIR}/kafka/userpass.txt" && \
+    cat "$(mkcert -CAROOT)/rootCA.pem" > "${SECRETS_DIR}/kafka/ca.crt" && \
+    kubectl -n glue get secrets kafka-super-user -o jsonpath='{.data.ca\.crt}' | base64 -d >> "${SECRETS_DIR}/kafka/ca.crt" && \
+    kubectl -n glue get secrets kafka-super-user -o jsonpath='{.data.user\.p12}' | base64 -d > "${SECRETS_DIR}/kafka/user.p12"
+}
+
+# Function create an spring boot application yaml
+GENERATE_SPRING_BOOT() {
+  cat - <<YAML > "${SCRIPT_DIR}/../application.yaml"
+spring:
+  kafka:
+    bootstrap-servers: bootstrap.local.lgc:9094
+    security:
+      protocol: SSL
+    ssl:
+      key-store-type: PKCS12
+      key-store-location: file://${SECRETS_DIR}/kafka/user.p12
+      key-store-password: $(cat "${SECRETS_DIR}/kafka/userpass.txt")
+      trust-store-type: PEM
+      trust-store-location: file://${SECRETS_DIR}/kafka/ca.crt
+    properties:
+      auto.register.schemas: true
+      schema.registry.url: https://sr.local.lgc
+      ssl.client.auth: true
+YAML
+
+  echo Ensure that the following environment variable is defined SPRING_CONFIG_ADDITIONAL_LOCATION=file://${PWD}/application.yaml
 }
 
 CHECK_PREREQUISITES() {
   if ! hash kubectl 2>/dev/null; then fail "kubectl not installed"; exit 1; fi
   if ! hash helm 2>/dev/null; then fail "helm not installed"; exit 1; fi
   if ! hash mkcert 2>/dev/null; then fail "mkcert not installed"; exit 1; fi
-  if ! hash Docker 2>/dev/null; then fail "Docker not installed"; exit 1; fi
+  if ! hash docker 2>/dev/null; then fail "docker not installed"; exit 1; fi
 }
 
 # Check command line arguments to determine which function to call
@@ -44,6 +71,7 @@ if [ "$1" = "create-cluster" ]; then
     KIND_CREATE_CLUSTER
 elif [ "$1" = "get-secrets" ]; then
     KIND_GET_SECRETS
+    GENERATE_SPRING_BOOT
 else
     echo "Usage: $0 {create-cluster|get-secrets}"
     exit 1
