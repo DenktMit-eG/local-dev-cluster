@@ -1,5 +1,16 @@
-This repository contains an example for a local development environment on kubernetes
-It contains:
+# Kubernetes toy cluster for development
+
+This repository contains an example for a local development environment on kubernetes. The motivation
+of this project is given in the 2024 blog post by Daniel Roth on the DenktMit tech blog:
+[Local Development for Kubernetes done right](https://denktmit.de/blog/2024-02-28-local-development-for-kubernetes-done-right/).
+
+## Contents
+
+This project is supposed to be rolled out on your desktop computer or a machine with a proper
+browser installed. The reason for this is the way how services are identified by their web domain
+name.
+
+This project contains:
 - [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator/tree/0.40.0/examples)
   - Preconfigured Kafka Cluster
 - [Strimzi Registry Operator](https://github.com/lsst-sqre/strimzi-registry-operator)
@@ -76,6 +87,8 @@ export PROJECT_DOMAIN="local.lgc"
 helm upgrade --install --create-namespace --namespace cert-manager cert-manager charts/cert-manager --atomic
 helm upgrade --install --create-namespace --namespace traefik traefik charts/traefik --atomic
 helm upgrade --install --create-namespace --namespace strimzi-kafka-operator strimzi-kafka-operator charts/strimzi-kafka-operator --atomic
+## NOTE: If the above command fails with a timeout error, try an upstream version instead:
+# helm upgrade --install -n strimzi-kafka-operator  strimzi-registry-operator charts/strimzi-registry-operator
 kubectl create secret tls root-ca-secret \
   --cert="$(mkcert -CAROOT)/rootCA.pem" \
   --key="$(mkcert -CAROOT)/rootCA-key.pem" \
@@ -87,8 +100,9 @@ helm upgrade --install --create-namespace --atomic  --namespace keycloak keycloa
 
 ### Setup / Recreate using Earthly
 
-You can also use the Earthly scripts to install or recreate the cluster within minutes.
-NOTE: This will not install [prerequisities](#Prerequisites)
+You can also use the [Earthly](https://github.com/earthly/earthly) scripts to install or recreate the cluster within minutes.
+
+NOTE: This will not install the [prerequisities](#Prerequisites). Furthermore, note that open-source earthly reached end-of-life.
 
 #### Create
 ```bash
@@ -98,6 +112,15 @@ earthly +kind-create-local
 #### Recreate
 ```bash
 earthly +kind-recreate-local
+```
+
+### Testing service reachability
+
+Point your browser for instance to https://keycloak.local.lgc. If you don't have a browser at hand,
+you can try, for instance:
+
+```shell
+curl -H "Host: keycloak.local.lgc" http://127.0.0.1
 ```
 
 ### get kafka secret
