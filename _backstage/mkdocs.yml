@@ -1,0 +1,53 @@
+site_name: Local Dev Cluster
+site_description: Documentation for the local Kubernetes development cluster
+repo_url: https://github.com/DenktMit-eG/local-dev-cluster
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Prerequisites: getting-started/prerequisites.md
+      - Local Setup: getting-started/local-setup.md
+      - Accessing Services: getting-started/accessing-services.md
+  - Platform Overview:
+      - Architecture: platform-overview/architecture.md
+      - Components: platform-overview/components.md
+      - Network and TLS: platform-overview/network-and-tls.md
+  - Developer Guide:
+      - Kafka and Schema Registry: developer-guide/kafka-and-schema-registry.md
+      - Keycloak Sandbox: developer-guide/keycloak-sandbox.md
+      - Spring Boot Configuration: developer-guide/spring-boot-configuration.md
+  - Operations:
+      - Recreate Cluster: operations/recreate-cluster.md
+      - Retrieve Secrets: operations/retrieve-secrets.md
+      - Troubleshooting: operations/troubleshooting.md
+  - Reference:
+      - Commands: reference/commands.md
+      - Endpoints: reference/endpoints.md
+      - Repository Files: reference/repository-files.md
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.sections
+    - navigation.tabs
+    - content.code.copy
+
+plugins:
+  - search
+
+markdown_extensions:
+  - tables
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
+      permalink: true
