@@ -1,0 +1,19 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: local-dev-cluster
+  description: Local Kubernetes development environment with Kafka, Schema Registry, Keycloak, Traefik, and cert-manager.
+  annotations:
+    backstage.io/techdocs-ref: dir:./
+    github.com/project-slug: DenktMit-eG/local-dev-cluster
+  tags:
+    - kubernetes
+    - kind
+    - helm
+    - kafka
+    - local-development
+spec:
+  type: infrastructure
+  lifecycle: development
+  owner: devops
+  system: local-development
