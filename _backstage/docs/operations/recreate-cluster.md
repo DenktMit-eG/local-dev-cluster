@@ -3,10 +3,10 @@
 The cluster is meant to be disposable. When something is wrong and the cause is not obvious, recreating is usually
 faster than debugging.
 
-## With Earthly
+## With Make
 
 ```bash
-earthly +kind-recreate-local
+make kind-recreate-local
 ```
 
 The target deletes the `lgc` cluster and runs the create flow from `scripts/kind_setup.sh`. After it finishes, the
@@ -15,7 +15,7 @@ The target deletes the `lgc` cluster and runs the create flow from `scripts/kind
 ## By hand
 
 ```bash
-kind delete cluster --name lgc
+./scripts/kind_setup.sh delete-cluster
 ./scripts/kind_setup.sh create-cluster
 ./scripts/kind_setup.sh get-secrets
 ```
@@ -27,7 +27,7 @@ to wait on a specific pod yourself.
 
 | Artifact                                            | Survives recreate?                                                                                    |
 |-----------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| Kafka topics, messages                              | No. The kind nodes are deleted, which removes the Docker volumes backing the Kafka and ZooKeeper PVCs |
+| Kafka topics, messages                              | No. The kind nodes are deleted, which removes the Docker volumes backing the Kafka broker PVCs        |
 | Schema Registry subjects                            | No. The data lives in the `registry-schemas` topic                                                    |
 | Keycloak realm changes made through the UI          | No. The realm is re-imported from the JSON on every pod start                                         |
 | `secrets/kafka/` and `application.yaml` on the host | Yes, but they no longer match the new cluster. Rerun `get-secrets`                                    |

@@ -6,9 +6,13 @@ and [Operations](../operations/recreate-cluster.md).
 ## Cluster lifecycle
 
 ```bash
-earthly +kind-create-local      # create cluster, install charts, extract secrets
-earthly +kind-recreate-local    # delete and rebuild
-kind delete cluster --name lgc  # delete only
+make kind-create-local          # create cluster, install charts, extract secrets
+make kind-recreate-local        # delete and rebuild
+make validate                   # helm lint + helm template
+make validate-cluster           # end-to-end checks against the running cluster
+make debug-cluster              # dump full cluster state under scripts/debug/<timestamp>/
+make clean                      # delete cluster and remove generated secrets
+make clean-secrets              # only remove secrets/ and application.yaml
 kind get clusters               # list local kind clusters
 kubectl config current-context  # expected: kind-lgc
 ```
@@ -18,6 +22,9 @@ kubectl config current-context  # expected: kind-lgc
 ```bash
 ./scripts/kind_setup.sh create-cluster   # bring up the cluster
 ./scripts/kind_setup.sh get-secrets      # write secrets/kafka/* and application.yaml
+./scripts/kind_setup.sh delete-cluster   # delete the cluster
+./scripts/validate-cluster.sh            # green/red health snapshot
+./scripts/debug-cluster.sh               # capture state to scripts/debug/<timestamp>/
 ```
 
 ## Helm

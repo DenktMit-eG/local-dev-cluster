@@ -51,7 +51,7 @@ Expected output: `2 certs in ca.crt`.
 
 ## After a recreate
 
-`kind delete cluster && earthly +kind-create-local` reissues the `kafka-super-user` Secret with new contents and a new
+`make kind-recreate-local` reissues the `kafka-super-user` Secret with new contents and a new
 password. Anything still using the old `secrets/kafka/` files will fail the TLS handshake. Rerun the script:
 
 ```bash

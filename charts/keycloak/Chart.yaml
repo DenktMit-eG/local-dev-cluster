@@ -1,5 +1,6 @@
 apiVersion: v2
 name: keycloak
+description: Keycloak in dev mode with the sandbox realm preloaded for the local-dev cluster.
 type: application
-version: 0.1.0
-appVersion: "23.0.4"
+version: 0.2.0
+appVersion: "26.6.1"

@@ -1,12 +1,12 @@
 # Kafka and Schema Registry
 
-The cluster runs a single-broker Kafka 3.6.0 in KRaft mode and a Confluent Schema Registry 7.6.0. Both are created by
+The cluster runs a single-broker Kafka 3.9.0 in KRaft mode and a Confluent Schema Registry 7.9.6. Both are created by
 `charts/dev-glue`. Clients connect to Kafka over mTLS on `bootstrap.local.lgc:9094` and to the Schema Registry over
 HTTPS on `sr.local.lgc`.
 
 ## Kafka client setup
 
-After `./scripts/kind_setup.sh get-secrets` (or `earthly +kind-create-local`), you have three files under
+After `./scripts/kind_setup.sh get-secrets` (or `make kind-create-local`), you have three files under
 `secrets/kafka/`:
 
 | File           | What it is                                                                                       |
@@ -75,10 +75,11 @@ does. Going via the external listener from inside the cluster works but is waste
 ## Schema Registry
 
 The Schema Registry runs as a Deployment named `confluent-schema-registry` in the `glue` namespace. The image is the
-standard Confluent Schema Registry (`confluentinc/cp-schema-registry:7.6.0`); it is provisioned indirectly through a
+standard Confluent Schema Registry (`confluentinc/cp-schema-registry:7.9.6`); it is provisioned indirectly through a
 `StrimziSchemaRegistry` CR (apiGroup `roundtable.lsst.codes/v1beta1`), which the LSST Strimzi Registry Operator
-reconciles into the Confluent deployment. The operator also handles wiring the registry's own `KafkaUser` (
-`confluent-schema-registry`) and reading the keystore from the Strimzi-managed Secret.
+reconciles into the Confluent deployment. The CR must carry a `strimzi.io/cluster: kafka-lfg` label so the operator
+knows which Strimzi cluster to wire it to. The operator also handles wiring the registry's own `KafkaUser`
+(`confluent-schema-registry`) and reading the keystore from the Strimzi-managed Secret.
 
 It is reachable at:
 
@@ -86,10 +87,8 @@ It is reachable at:
 https://sr.local.lgc
 ```
 
-Schemas are persisted to the Kafka topic `registry-schemas` (one partition, compacted). The topic is declared in
-`charts/dev-glue/templates/kafka/schema-topic.yaml` with `replicas: 3`. The current cluster has one broker; the topic
-still gets created because Kafka does not pre-validate replication factor against current broker count, but expanding
-the cluster to three brokers is what would make the setting honest.
+Schemas are persisted to the Kafka topic `registry-schemas` (one partition, compacted, single replica to match the
+single-broker cluster). The topic is declared in `charts/dev-glue/templates/kafka/schema-topic.yaml`.
 
 Quick sanity checks against the registry:
 

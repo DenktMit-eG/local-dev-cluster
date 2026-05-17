@@ -10,12 +10,12 @@ It is meant for integration testing and local application work, not production.
 
 | Area               | Implementation                                                    |
 |--------------------|-------------------------------------------------------------------|
-| Kubernetes runtime | kind cluster `lgc` (1 control-plane, 3 workers)                   |
-| Ingress            | Traefik 26.0.0, pinned to the control-plane node                  |
-| TLS                | cert-manager 1.14.2, issuing from the local mkcert root CA        |
-| Kafka              | Strimzi Operator 0.38.0, Kafka 3.6.0 with KRaft, single broker    |
-| Schema Registry    | Confluent Schema Registry 7.6.0 via the Strimzi Registry Operator |
-| Identity           | Keycloak 23.0.4 with a `sandbox` realm imported on start          |
+| Kubernetes runtime | kind cluster `lgc` (1 control-plane, 3 workers, pinned `kindest/node:v1.31.14`) |
+| Ingress            | Traefik 40.2.0, pinned to the control-plane node                  |
+| TLS                | cert-manager v1.20.2, issuing from the local mkcert root CA       |
+| Kafka              | Strimzi Operator 0.46.1, Kafka 3.9.0 with KRaft, single broker    |
+| Schema Registry    | Confluent Schema Registry 7.9.6 via the Strimzi Registry Operator |
+| Identity           | Keycloak 26.6.1 with a `sandbox` realm imported on start          |
 
 ## Where to start
 

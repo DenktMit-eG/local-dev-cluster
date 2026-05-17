@@ -3,8 +3,9 @@ kind: StrimziSchemaRegistry
 metadata:
   name: confluent-schema-registry
   labels:
+    strimzi.io/cluster: {{ .Values.kafka.clusterName }}
     {{- include "dev-glue.labels" . | nindent 4}}
 spec:
   listener: tls
   securityProtocol: SSL
-  registryImageTag: "7.6.0"
+  registryImageTag: "7.9.6"

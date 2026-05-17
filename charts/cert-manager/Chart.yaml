@@ -1,7 +1,10 @@
 apiVersion: v2
 name: cert-manager
-version: 0.0.1
+description: cert-manager packaged for the local-dev cluster, with the mkcert-rooted ClusterIssuer applied by dev-glue.
+type: application
+version: 1.20.2
+appVersion: "v1.20.2"
 dependencies:
   - name: cert-manager
-    version: v1.14.2
+    version: v1.20.2
     repository: https://charts.jetstack.io

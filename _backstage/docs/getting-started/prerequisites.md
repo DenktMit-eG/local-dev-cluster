@@ -12,9 +12,9 @@ authority.
 | [kubectl](https://kubernetes.io/docs/tasks/tools/) | Talks to the cluster                                   | `kubectl version --client` |
 | [Helm](https://helm.sh/docs/intro/install/)        | Installs the charts in this repo                       | `helm version`             |
 | [mkcert](https://github.com/FiloSottile/mkcert)    | Creates a locally trusted root CA used by cert-manager | `mkcert -version`          |
-| [Earthly](https://earthly.dev/) (optional)         | One-command cluster lifecycle                          | `earthly --version`        |
+| Make                                               | Runs the repository automation targets                 | `make --version`           |
 
-Earthly is optional. The same steps can be run by hand using `helm` and `kubectl`. See [Local Setup](local-setup.md).
+The Makefile wraps the same shell script and Helm commands that can be run by hand. See [Local Setup](local-setup.md).
 
 ## Install the local root CA
 

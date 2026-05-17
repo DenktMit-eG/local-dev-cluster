@@ -277,3 +277,4 @@ secrets
 ca.crt
 user.p12
 userpass.txt
+scripts/debug/

@@ -11,7 +11,7 @@ browser installed. The reason for this is the way how services are identified by
 name.
 
 This project contains:
-- [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator/tree/0.40.0/examples)
+- [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator/tree/0.46.1/examples)
   - Preconfigured Kafka Cluster
 - [Strimzi Registry Operator](https://github.com/lsst-sqre/strimzi-registry-operator)
   - Preconfigured Schema Registry
@@ -27,6 +27,7 @@ Traefik and cert-manager is configured for local DNS resolution and tls with val
 2. Kind Installed https://kind.sigs.k8s.io/
 3. Helm Installed https://helm.sh/docs/intro/install/
 4. mkcert installed https://github.com/FiloSottile/mkcert?tab=readme-ov-file#installation
+5. Make installed
 
 ```mermaid
 flowchart TD
@@ -35,9 +36,9 @@ flowchart TD
     subgraph Computer
         subgraph docker
             subgraph kind
-                controlPlane --> traefic
-                traefic --> kafka
-                traefic --> keycloak
+                controlPlane --> traefik
+                traefik --> kafka
+                traefik --> keycloak
             end
         end
     end
@@ -98,20 +99,23 @@ helm upgrade --create-namespace --install -n glue glue ./charts/dev-glue --atomi
 helm upgrade --install --create-namespace --atomic  --namespace keycloak keycloak ./charts/keycloak  --set "global.projectDomain=${PROJECT_DOMAIN}"
 ```
 
-### Setup / Recreate using Earthly
+### Setup / Recreate using Make
 
-You can also use the [Earthly](https://github.com/earthly/earthly) scripts to install or recreate the cluster within minutes.
-
-NOTE: This will not install the [prerequisities](#Prerequisites). Furthermore, note that open-source earthly reached end-of-life.
+You can also use the Make targets to install or recreate the cluster within minutes.
 
 #### Create
 ```bash
-earthly +kind-create-local
+make kind-create-local
 ```
 
 #### Recreate
 ```bash
-earthly +kind-recreate-local
+make kind-recreate-local
+```
+
+#### Validate charts
+```bash
+make validate
 ```
 
 ### Testing service reachability
@@ -188,8 +192,8 @@ keycloak is running in dev mode
 ### Roles:
 
 * admin-action
-* reader-action
-* writer-action
+* read-action
+* write-action
 
 ### Public client sandbox-ui
 
