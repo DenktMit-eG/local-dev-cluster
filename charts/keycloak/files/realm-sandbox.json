@@ -2359,7 +2359,7 @@
     "cibaInterval": "5",
     "realmReusableOtpCode": "false"
   },
-  "keycloakVersion": "23.0.4",
+  "keycloakVersion": "26.6.1",
   "userManagedAccessAllowed": false,
   "clientProfiles": {
     "profiles": []

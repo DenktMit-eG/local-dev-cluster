@@ -1,9 +1,10 @@
 apiVersion: v2
 name: strimzi-kafka-operator
+description: Strimzi Kafka operator packaged for the local-dev cluster, watching all namespaces with a 512Mi/768Mi memory bump.
 type: application
-version: 0.38.0
-appVersion: 0.38.0
+version: 0.46.1
+appVersion: 0.46.1
 dependencies:
   - name: strimzi-kafka-operator
-    version: 0.38.0
+    version: 0.46.1
     repository: https://strimzi.io/charts/

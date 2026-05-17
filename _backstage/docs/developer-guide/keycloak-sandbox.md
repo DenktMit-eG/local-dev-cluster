@@ -36,8 +36,7 @@ Groups carry realm roles, which is what your application receives in the `groups
 | `writers` | `write-action`, `read-action`                                          |
 | `readers` | `read-action`                                                          |
 
-The custom realm roles are `read-action`, `write-action`, and `admin-action`. The repository README mentions
-`reader-action` / `writer-action`; the realm JSON is the authoritative source and uses the names listed above.
+The custom realm roles are `read-action`, `write-action`, and `admin-action`.
 
 ## sandbox-ui client
 

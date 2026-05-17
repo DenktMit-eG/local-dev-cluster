@@ -10,7 +10,7 @@ The setup script generates an `application.yaml` at the repository root that wir
 ./scripts/kind_setup.sh get-secrets
 ```
 
-The script also runs as part of `earthly +kind-create-local`, so a fresh `earthly +kind-create-local` produces both the
+The script also runs as part of `make kind-create-local`, so a fresh `make kind-create-local` produces both the
 cluster and the `application.yaml`.
 
 ## What the file contains
@@ -61,7 +61,7 @@ prints to stdout after generation.
 
 ## Regenerating after a recreate
 
-`kind delete cluster && earthly +kind-create-local` issues a fresh `kafka-super-user` Secret with new keystore contents
+`make kind-recreate-local` issues a fresh `kafka-super-user` Secret with new keystore contents
 and a new password. The old `application.yaml` and `secrets/kafka/` files no longer match the broker. Always rerun
 `get-secrets` after a recreate; the script overwrites both atomically.
 

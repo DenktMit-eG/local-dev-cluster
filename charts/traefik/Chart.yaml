@@ -1,10 +1,10 @@
 apiVersion: v2
 name: traefik
-description: A Helm chart for Kubernetes
+description: Traefik packaged for the local-dev cluster, pinned to the control-plane node with a custom kafka-mtls TCP entrypoint on 9094.
 type: application
-version: 0.1.0
-appVersion: "1.16.0"
+version: 40.2.0
+appVersion: "3.7.1"
 dependencies:
   - name: traefik
-    version: 26.0.0
+    version: 40.2.0
     repository: https://traefik.github.io/charts

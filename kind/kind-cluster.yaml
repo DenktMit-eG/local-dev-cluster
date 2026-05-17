@@ -3,6 +3,7 @@ apiVersion: kind.x-k8s.io/v1alpha4
 name: lgc
 nodes:
   - role: control-plane
+    image: &node-image kindest/node:v1.31.14
     # use the control plane as "load balancer" for L7 traffic
     kubeadmConfigPatches:
       - |
@@ -21,5 +22,8 @@ nodes:
         hostPort: 9094
         protocol: TCP
   - role: worker
+    image: *node-image
   - role: worker
+    image: *node-image
   - role: worker
+    image: *node-image

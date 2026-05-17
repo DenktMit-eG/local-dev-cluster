@@ -1,6 +1,6 @@
 dependencies:
 - name: strimzi-registry-operator
   repository: https://lsst-sqre.github.io/charts/
-  version: 2.1.0
-digest: sha256:413ad069e563ef3fc5039b7410d0b82b892cb8f52ccb76157da1af6629b02e86
-generated: "2024-04-03T12:08:18.189538+02:00"
+  version: 2.1.3
+digest: sha256:6d4cebb0552f8d4a5964ca7f4f1f0ab02369a47f4bf107582a03096134221fef
+generated: "2026-05-17T21:16:12.280334775+02:00"

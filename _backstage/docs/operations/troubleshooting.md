@@ -3,6 +3,24 @@
 This page covers failure modes that come up while bringing the cluster up or while connecting to it. For each, the
 diagnostic comes first and the fix follows.
 
+## Health check and state dump
+
+Before chasing individual symptoms, run the two helper scripts. They cover the common categories of failure on their
+own and give you a frozen snapshot to share when they do not.
+
+```bash
+make validate-cluster      # ./scripts/validate-cluster.sh
+make debug-cluster         # ./scripts/debug-cluster.sh
+```
+
+`validate-cluster` checks `kubectl` context, `/etc/hosts`, operator pods, every Strimzi CR, TLS plumbing, the HTTPS
+endpoints behind Traefik, the on-disk Kafka client secrets, and (if `kcat` is installed) a real produce/consume
+round-trip through the `kafka-mtls` Traefik entrypoint. It exits non-zero if anything fails so it is safe in CI.
+
+`debug-cluster` writes a timestamped directory under `scripts/debug/` containing pod logs, events, every Strimzi CR as
+YAML, the Traefik ingress configuration, and the validate output up top. A `.tar.gz` of the same is written next to it
+for sharing.
+
 ## Wrong kube context
 
 ```bash
@@ -16,7 +34,7 @@ kind export kubeconfig --name lgc
 ```
 
 If `kind get clusters` does not list `lgc` at all, the cluster was deleted or never created. Run
-`earthly +kind-create-local`.
+`make kind-create-local`.
 
 ## Certificate not trusted in the browser
 
@@ -110,12 +128,6 @@ cert-manager could not issue a certificate. Two common causes:
 The issuer is created by `dev-glue`, so a missing `default-cluster-issuer` usually means the `dev-glue` install failed;
 check `helm list -n glue` and the `kubectl describe` of the failing resource.
 
-## Schema topic shows `replicas: 3` warnings
-
-The `registry-schemas` topic is declared with `replicas: 3` but the cluster has one broker. Strimzi creates the topic
-anyway; the warning is benign for development. To make the warning go away, either lower the topic replication factor in
-`charts/dev-glue/templates/kafka/schema-topic.yaml` or scale the `KafkaNodePool` to three replicas.
-
 ## `kafka-super-user` Secret is empty
 
 The setup script protects against this with a 15-second sleep, but if you extracted the secret manually right after pod
@@ -133,7 +145,7 @@ A value below ~3000 bytes means the secret has not been populated. Wait, then re
 When the failure mode is unclear, recreate:
 
 ```bash
-earthly +kind-recreate-local
+make kind-recreate-local
 ```
 
 See [Recreate Cluster](recreate-cluster.md) for what survives a recreate and what does not.

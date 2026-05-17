@@ -1,14 +1,14 @@
 # Local Setup
 
-You can bring the cluster up with one Earthly command or by running the same steps by hand. The two paths produce the
-same result.
+You can bring the cluster up with one Make command or by running the same steps by hand. The two paths produce the same
+result.
 
-## With Earthly
+## With Make
 
 From the repository root:
 
 ```bash
-earthly +kind-create-local
+make kind-create-local
 ```
 
 This target runs `scripts/kind_setup.sh create-cluster` followed by `scripts/kind_setup.sh get-secrets`. It creates the
@@ -18,7 +18,7 @@ credentials to `secrets/kafka/`, and writes an `application.yaml` at the reposit
 To wipe and rebuild:
 
 ```bash
-earthly +kind-recreate-local
+make kind-recreate-local
 ```
 
 This deletes the `lgc` cluster and runs the create target again.
@@ -98,13 +98,19 @@ kubectl get kafka,kafkanodepool,kafkauser,kafkatopic -n glue
 kubectl get pods -n keycloak
 ```
 
-The Kafka pod takes the longest to become ready because it runs through ZooKeeper and broker startup. Once
+The Kafka pod takes the longest to become ready because it runs through KRaft controller and broker startup. Once
 `kubectl get kafka -n glue` reports `Ready=True`, the schema registry pod will start.
+
+For a programmatic health check across the whole stack:
+
+```bash
+./scripts/validate-cluster.sh     # or: make validate-cluster
+```
 
 ## Tear down
 
 ```bash
-kind delete cluster --name lgc
+make clean
 ```
 
 This removes the cluster and all of its volumes. The `secrets/kafka/` directory and `application.yaml` on the host stay

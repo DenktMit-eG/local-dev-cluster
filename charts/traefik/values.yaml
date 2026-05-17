@@ -1,6 +1,4 @@
 traefik:
-  globalArguments: []
-
   providers:
     kubernetesIngress:
       publishedService:

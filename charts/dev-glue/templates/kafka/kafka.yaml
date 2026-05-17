@@ -13,10 +13,7 @@ spec:
     topicOperator: {}
 
   kafka:
-    version: 3.6.0
-    # The replicas field is required by the Kafka CRD schema while the KafkaNodePools feature gate is in alpha phase.
-    # But it will be ignored when Kafka Node Pools are used
-    replicas: 1
+    version: 3.9.0
     listeners:
       - name: plain
         port: 9092
@@ -58,19 +55,3 @@ spec:
       transaction.state.log.min.isr: 1
       default.replication.factor: 1
       min.insync.replicas: 1
-      inter.broker.protocol.version: "3.6"
-    # The storage field is required by the Kafka CRD schema while the KafkaNodePools feature gate is in alpha phase.
-    # But it will be ignored when Kafka Node Pools are used
-    storage:
-      type: jbod
-      volumes:
-        - id: 0
-          type: persistent-claim
-          size: 10Gi
-          deleteClaim: false
-  zookeeper:
-    replicas: 1
-    storage:
-      type: persistent-claim
-      size: 10Gi
-      deleteClaim: true

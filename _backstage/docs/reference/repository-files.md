@@ -9,9 +9,11 @@ everything else is either upstream or orchestration.
 |--------------------------|------------------------------------------------------------------------------------------------------------|
 | `README.md`              | Original setup notes; the canonical reference for hosts entries and Spring Boot connection settings        |
 | `CLAUDE.md`              | Repository guide for AI coding assistants; mirrors much of this documentation                              |
-| `Earthfile`              | Earthly targets `+kind-create-local` and `+kind-recreate-local`, both calling `scripts/kind_setup.sh`      |
-| `kind/kind-cluster.yaml` | kind cluster definition: 1 control-plane (with `ingress-ready=true` and host ports 80/443/9094), 3 workers |
-| `scripts/kind_setup.sh`  | Bootstrap, secret extraction, and Spring Boot `application.yaml` generation                                |
+| `Makefile`                     | Local and CI-friendly automation targets for cluster lifecycle, chart validation, and live-cluster health checks |
+| `kind/kind-cluster.yaml`       | kind cluster definition: 1 control-plane (with `ingress-ready=true` and host ports 80/443/9094), 3 workers, all pinned to `kindest/node:v1.31.14` via a YAML anchor |
+| `scripts/kind_setup.sh`        | Bootstrap, secret extraction, and Spring Boot `application.yaml` generation                                      |
+| `scripts/validate-cluster.sh`  | End-to-end health checks (pods, CRs, TLS plumbing, HTTPS endpoints, Kafka mTLS round-trip)                       |
+| `scripts/debug-cluster.sh`     | Dumps cluster state into `scripts/debug/<timestamp>/` for diagnosing failures; includes the validate output      |
 | `charts/`                | Helm charts (see below)                                                                                    |
 | `_backstage/`            | This documentation site (mkdocs + Backstage TechDocs metadata)                                             |
 | `_backstage-reference/`  | Reference documentation from a larger sibling project; left in place as a worked example                   |
@@ -21,10 +23,10 @@ everything else is either upstream or orchestration.
 
 | Chart                               | Type                                                | Highlights                                                                                  |
 |-------------------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------|
-| `charts/cert-manager/`              | Wrapper around Jetstack cert-manager 1.14.2         | `installCRDs: true`, Prometheus disabled                                                    |
-| `charts/traefik/`                   | Wrapper around Traefik 26.0.0                       | Pinned to `ingress-ready=true` node, host ports 80/443/9094, custom `kafka-mtls` entrypoint |
-| `charts/strimzi-kafka-operator/`    | Wrapper around Strimzi 0.38.0                       | `watchAnyNamespace: true`, KRaft + KafkaNodePools feature gates                             |
-| `charts/strimzi-registry-operator/` | Wrapper around LSST Strimzi Registry Operator 2.1.0 | `clusterName: kafka-lfg`, `clusterNamespace: glue`                                          |
+| `charts/cert-manager/`              | Wrapper around Jetstack cert-manager v1.20.2        | `installCRDs: true`, Prometheus disabled                                                    |
+| `charts/traefik/`                   | Wrapper around Traefik 40.2.0 (app v3.7.1)          | Pinned to `ingress-ready=true` node, host ports 80/443/9094, custom `kafka-mtls` entrypoint |
+| `charts/strimzi-kafka-operator/`    | Wrapper around Strimzi 0.46.1                       | `watchAnyNamespace: true`, 512Mi/768Mi memory; KRaft + node-pools enabled per-CR by annotation |
+| `charts/strimzi-registry-operator/` | Wrapper around LSST Strimzi Registry Operator 2.1.3 | `clusterName: kafka-lfg`, `clusterNamespace: glue`                                          |
 | `charts/dev-glue/`                  | First-party                                         | The keystone chart (Kafka, Schema Registry, ClusterIssuer, Traefik routes)                  |
 | `charts/keycloak/`                  | First-party                                         | Keycloak in dev mode with a sandbox realm imported from JSON                                |
 
@@ -41,7 +43,7 @@ everything else is either upstream or orchestration.
 | `templates/kafka/schema-topic.yaml`          | `KafkaTopic registry-schemas`                     |
 | `templates/kafka/schema-registry.yaml`       | `StrimziSchemaRegistry confluent-schema-registry` |
 | `templates/kafka/schema-ingress.yaml`        | `Ingress` for `sr.local.lgc`                      |
-| `templates/kafka/traefic-port-forward.yaml`  | `IngressRouteTCP` for the `kafka-mtls` entrypoint |
+| `templates/kafka/traefik-port-forward.yaml`  | `IngressRouteTCP` for the `kafka-mtls` entrypoint |
 
 ### `charts/keycloak/`
 

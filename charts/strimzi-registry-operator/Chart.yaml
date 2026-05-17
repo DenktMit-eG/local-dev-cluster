@@ -1,10 +1,10 @@
 apiVersion: v2
 name: strimzi-registry-operator
-description: A Helm chart for Kubernetes
+description: LSST strimzi-registry-operator packaged for the local-dev cluster; reconciles StrimziSchemaRegistry CRs against the kafka-lfg cluster in the glue namespace.
 type: application
-version: 2.1.0
-appVersion: 2.1.0
+version: 2.1.3
+appVersion: 2.1.3
 dependencies:
   - name: strimzi-registry-operator
-    version: 2.1.0
+    version: 2.1.3
     repository: https://lsst-sqre.github.io/charts/
