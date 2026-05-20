@@ -3,4 +3,4 @@ name: dev-glue
 description: "First-party glue chart that wires the local-dev cluster together: ClusterIssuer, Kafka, KafkaNodePool, KafkaUsers, Schema Registry, and Traefik routes."
 type: application
 version: 0.2.0
-appVersion: "3.9.0"
+appVersion: "4.2.0"

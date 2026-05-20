@@ -9,6 +9,12 @@ spec:
   issuerRef:
     name: default-cluster-issuer
     kind: ClusterIssuer
+  # Kafka 4.x's DefaultSslEngineFactory.PemStore only parses PKCS#8 private keys
+  # ("BEGIN PRIVATE KEY"). cert-manager defaults to PKCS#1 for RSA, which Kafka 4
+  # rejects with "algid parse error, not a sequence" at broker startup.
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS8
   dnsNames:
     - bootstrap.{{ .Values.global.projectDomain}}
     - b0.{{ .Values.global.projectDomain}}
