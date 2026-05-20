@@ -71,7 +71,7 @@ echo
   echo "  ns-cert-manager/           cert-manager controller + webhook + cainjector"
   echo "  ns-traefik/                Traefik controller + IngressRoute(TCP) configs"
   echo "  ns-strimzi-kafka-operator/ Strimzi cluster operator + registry operator"
-  echo "  ns-glue/                   Kafka cluster, KafkaNodePool, users, topics, schema-registry"
+  echo "  ns-glue/                   Kafka cluster, KafkaNodePool, users, topics, schema-registry, kafka-ui (+ kafka-ui-api.txt for the UI's own cluster view)"
   echo "  ns-keycloak/               Keycloak deployment + realm import ConfigMap"
   echo "  charts/                    Wrapper Chart.yaml + values overlays for reference"
 } > "${OUT_ROOT}/00-bundle-manifest.txt"
@@ -181,6 +181,19 @@ for pod in $(kubectl -n glue get pods -o name 2>/dev/null); do
   name="${pod#pod/}"
   LOGS "${OUT_ROOT}/ns-glue/logs-${name}.log" glue "${pod}" --all-containers=true
 done
+
+# 6b. Kafka UI external API snapshot ---------------------------------------
+# Kafka UI's /api/clusters returns its own view of the broker connection. When
+# the UI runs but cannot reach Kafka over mTLS, the deployment is Ready but the
+# cluster shows "status":"offline" with a "lastKafkaException" field. Capturing
+# this here saves a manual curl during triage.
+KAFKA_UI_HOST="kafka-ui.${PROJECT_DOMAIN:-local.lgc}"
+{
+  printf "$ curl -sk https://%s/api/clusters\n" "${KAFKA_UI_HOST}"
+  curl -sk --max-time 5 "https://${KAFKA_UI_HOST}/api/clusters" 2>&1 || true
+  printf "\n\n$ curl -sk https://%s/actuator/health\n" "${KAFKA_UI_HOST}"
+  curl -sk --max-time 5 "https://${KAFKA_UI_HOST}/actuator/health" 2>&1 || true
+} > "${OUT_ROOT}/ns-glue/kafka-ui-api.txt"
 
 # 7. Keycloak --------------------------------------------------------------
 RUN "${OUT_ROOT}/ns-keycloak/pods.txt"      -n keycloak get pods -o wide
