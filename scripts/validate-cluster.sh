@@ -105,12 +105,13 @@ else
   FAILED "KafkaNodePool ${KAFKA_NODEPOOL} has no replicas/nodeIds in status"
 fi
 
-# Strimzi Kafka custom metadata-state check (KRaft, not ZooKeeper)
-metadata_state=$(kubectl -n "${GLUE_NAMESPACE}" get kafka "${KAFKA_CLUSTER}" -o jsonpath='{.status.kafkaMetadataState}' 2>/dev/null || echo "")
-if [ "${metadata_state}" = "KRaft" ]; then
-  PASSED "Kafka ${KAFKA_CLUSTER} using KRaft metadata"
+# Strimzi 0.51 dropped status.kafkaMetadataState since KRaft is the only supported mode.
+# Verify the broker actually came up by checking status.kafkaVersion is populated.
+kafka_version=$(kubectl -n "${GLUE_NAMESPACE}" get kafka "${KAFKA_CLUSTER}" -o jsonpath='{.status.kafkaVersion}' 2>/dev/null || echo "")
+if [ -n "${kafka_version}" ]; then
+  PASSED "Kafka ${KAFKA_CLUSTER} status.kafkaVersion=${kafka_version}"
 else
-  FAILED "Kafka ${KAFKA_CLUSTER} metadata state is '${metadata_state:-unknown}', expected KRaft"
+  FAILED "Kafka ${KAFKA_CLUSTER} has no status.kafkaVersion (broker did not finish startup)"
 fi
 
 # StrimziSchemaRegistry has no status.conditions; the operator creates a Deployment
