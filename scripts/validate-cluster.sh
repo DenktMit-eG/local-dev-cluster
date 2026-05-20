@@ -48,7 +48,7 @@ else
   FAILED "kubectl context is not ${KUBE_CONTEXT} ($(kubectl config current-context 2>/dev/null || echo none))"
 fi
 
-for host in bootstrap b0 sr keycloak; do
+for host in bootstrap b0 sr keycloak kafka-ui; do
   fqdn="${host}.${PROJECT_DOMAIN}"
   if getent hosts "${fqdn}" 2>/dev/null | grep -qE '^127\.0\.0\.1\b'; then
     PASSED "/etc/hosts: ${fqdn} -> 127.0.0.1"
@@ -77,6 +77,7 @@ CHECK_DEPLOY traefik                traefik
 CHECK_DEPLOY strimzi-kafka-operator strimzi-cluster-operator
 CHECK_DEPLOY strimzi-kafka-operator strimzi-registry-operator
 CHECK_DEPLOY keycloak               keycloak
+CHECK_DEPLOY "${GLUE_NAMESPACE}"    kafka-ui
 
 # 3. Strimzi CRs in the glue namespace --------------------------------------
 SECTION "Strimzi CRs"
@@ -177,6 +178,17 @@ CHECK_HTTP() {
 CHECK_HTTP "https://keycloak.${PROJECT_DOMAIN}/"            any2or3xx
 CHECK_HTTP "https://keycloak.${PROJECT_DOMAIN}/realms/sandbox/.well-known/openid-configuration" 200
 CHECK_HTTP "https://sr.${PROJECT_DOMAIN}/subjects"          200
+CHECK_HTTP "https://kafka-ui.${PROJECT_DOMAIN}/actuator/health" 200
+
+# Kafka UI exposes /api/clusters returning [{"name":"local","status":"online",...}].
+# A passing check here proves Kafka UI is up AND that its mTLS handshake against
+# the in-cluster Kafka broker succeeded.
+clusters_json=$(curl -sk --max-time 5 "https://kafka-ui.${PROJECT_DOMAIN}/api/clusters" 2>/dev/null || echo "")
+if echo "${clusters_json}" | grep -q '"status":"online"'; then
+  PASSED "Kafka UI reports cluster online via /api/clusters"
+else
+  FAILED "Kafka UI /api/clusters did not report online: ${clusters_json:-<empty>}"
+fi
 
 # 6. Local Kafka client secrets --------------------------------------------
 SECTION "Kafka client secrets on disk"

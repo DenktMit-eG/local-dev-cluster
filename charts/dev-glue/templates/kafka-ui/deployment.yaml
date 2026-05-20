@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  labels:
+    {{- include "dev-glue.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "dev-glue.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: kafka-ui
+  template:
+    metadata:
+      labels:
+        {{- include "dev-glue.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: kafka-ui
+    spec:
+      containers:
+        - name: kafka-ui
+          image: provectuslabs/kafka-ui:v0.7.2
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: KAFKA_CLUSTERS_0_NAME
+              value: local
+            - name: KAFKA_CLUSTERS_0_READONLY
+              value: "false"
+            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+              value: {{ .Values.kafka.clusterName }}-kafka-bootstrap.{{ .Release.Namespace }}.svc:9093
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL
+              value: SSL
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_TYPE
+              value: PKCS12
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_LOCATION
+              value: /certs/keystore/user.p12
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-super-user
+                  key: user.password
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_TYPE
+              value: PKCS12
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_LOCATION
+              value: /certs/truststore/ca.p12
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.kafka.clusterName }}-cluster-ca-cert
+                  key: ca.password
+            - name: KAFKA_CLUSTERS_0_SCHEMAREGISTRY
+              value: http://confluent-schema-registry.{{ .Release.Namespace }}.svc:8081
+          volumeMounts:
+            - name: kafka-keystore
+              mountPath: /certs/keystore
+              readOnly: true
+            - name: kafka-truststore
+              mountPath: /certs/truststore
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 768Mi
+      volumes:
+        - name: kafka-keystore
+          secret:
+            secretName: kafka-super-user
+            items:
+              - key: user.p12
+                path: user.p12
+        - name: kafka-truststore
+          secret:
+            secretName: {{ .Values.kafka.clusterName }}-cluster-ca-cert
+            items:
+              - key: ca.p12
+                path: ca.p12
